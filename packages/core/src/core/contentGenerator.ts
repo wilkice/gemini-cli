@@ -15,7 +15,9 @@ import {
 } from '@google/genai';
 import { createCodeAssistContentGenerator } from '../code_assist/codeAssist.js';
 import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
+import { Config } from '../config/config.js';
 import { getEffectiveModel } from './modelCheck.js';
+import { UserTierId } from '../code_assist/types.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -32,6 +34,8 @@ export interface ContentGenerator {
   countTokens(request: CountTokensParameters): Promise<CountTokensResponse>;
 
   embedContent(request: EmbedContentParameters): Promise<EmbedContentResponse>;
+
+  getTier?(): Promise<UserTierId | undefined>;
 }
 
 export enum AuthType {
@@ -52,6 +56,7 @@ export async function createContentGeneratorConfig(
   model: string | undefined,
   authType: AuthType | undefined,
 ): Promise<ContentGeneratorConfig> {
+
   const geminiApiKey = process.env.GEMINI_API_KEY;
   const googleApiKey = process.env.GOOGLE_API_KEY;
   const googleCloudProject = process.env.GOOGLE_CLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT_ID;
@@ -75,6 +80,7 @@ export async function createContentGeneratorConfig(
 
   if (authType === AuthType.USE_GEMINI && geminiApiKey) {
     contentGeneratorConfig.apiKey = geminiApiKey;
+    contentGeneratorConfig.vertexai = false;
     contentGeneratorConfig.model = await getEffectiveModel(
       contentGeneratorConfig.apiKey,
       contentGeneratorConfig.model,
@@ -85,16 +91,10 @@ export async function createContentGeneratorConfig(
 
   if (
     authType === AuthType.USE_VERTEX_AI &&
-    !!googleApiKey &&
-    googleCloudProject &&
-    googleCloudLocation
+    (googleApiKey || (googleCloudProject && googleCloudLocation))
   ) {
     contentGeneratorConfig.apiKey = googleApiKey;
     contentGeneratorConfig.vertexai = true;
-    contentGeneratorConfig.model = await getEffectiveModel(
-      contentGeneratorConfig.apiKey,
-      contentGeneratorConfig.model,
-    );
 
     return contentGeneratorConfig;
   }
@@ -104,6 +104,7 @@ export async function createContentGeneratorConfig(
 
 export async function createContentGenerator(
   config: ContentGeneratorConfig,
+  gcConfig: Config,
   sessionId?: string,
 ): Promise<ContentGenerator> {
   const version = process.env.CLI_VERSION || process.version;
@@ -119,6 +120,7 @@ export async function createContentGenerator(
     return createCodeAssistContentGenerator(
       httpOptions,
       config.authType,
+      gcConfig,
       sessionId,
     );
   }
