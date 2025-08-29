@@ -309,11 +309,9 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     !config.getScreenReader();
 
   useEffect(() => {
-    // When the folder trust dialog is about to open, we need to force a refresh
-    // of the static content to ensure the Tips are hidden correctly.
-    if (isFolderTrustDialogOpen) {
-      refreshStatic();
-    }
+    // When the folder trust dialog is about to open/close, we need to force a refresh
+    // of the static content to ensure the Tips are hidden/shown correctly.
+    refreshStatic();
   }, [isFolderTrustDialogOpen, refreshStatic]);
 
   const {
