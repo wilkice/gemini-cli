@@ -1265,6 +1265,26 @@ describe('App UI', () => {
       expect(lastFrame()).toContain('Do you trust this folder?');
     });
 
+    it('should not display Tips component when folder trust dialog is open', async () => {
+      const { useFolderTrust } = await import('./hooks/useFolderTrust.js');
+      vi.mocked(useFolderTrust).mockReturnValue({
+        isFolderTrustDialogOpen: true,
+        handleFolderTrustSelect: vi.fn(),
+        isRestarting: false,
+      });
+
+      const { unmount } = renderWithProviders(
+        <App
+          config={mockConfig as unknown as ServerConfig}
+          settings={mockSettings}
+          version={mockVersion}
+        />,
+      );
+      currentUnmount = unmount;
+      await Promise.resolve();
+      expect(vi.mocked(Tips)).not.toHaveBeenCalled();
+    });
+
     it('should not display the folder trust dialog when the feature is disabled', async () => {
       const { useFolderTrust } = await import('./hooks/useFolderTrust.js');
       vi.mocked(useFolderTrust).mockReturnValue({
