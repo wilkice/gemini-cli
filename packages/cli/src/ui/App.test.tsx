@@ -1285,6 +1285,53 @@ describe('App UI', () => {
       expect(vi.mocked(Tips)).not.toHaveBeenCalled();
     });
 
+    it('should show Tips after the dialog is closed via user interaction', async () => {
+      const { useFolderTrust } = await import('./hooks/useFolderTrust.js');
+      const mockUseFolderTrust = vi.mocked(useFolderTrust);
+      let isFolderTrustDialogOpen = true;
+
+      const handleFolderTrustSelect = () => {
+        isFolderTrustDialogOpen = false;
+      };
+
+      mockUseFolderTrust.mockImplementation(() => ({
+        isFolderTrustDialogOpen,
+        handleFolderTrustSelect,
+        isRestarting: false,
+      }));
+
+      const { lastFrame, rerender, stdin, unmount } = renderWithProviders(
+        <App
+          config={mockConfig as unknown as ServerConfig}
+          settings={mockSettings}
+          version={mockVersion}
+        />,
+      );
+      currentUnmount = unmount;
+
+      // Ensure dialog is open and tips are hidden
+      expect(lastFrame()).toContain('Do you trust this folder?');
+      expect(vi.mocked(Tips)).not.toHaveBeenCalled();
+
+      // Simulate user pressing escape to close the dialog
+      stdin.write('\x1b');
+
+      // Rerender to apply the state change from the mock
+      rerender(
+        <App
+          config={mockConfig as unknown as ServerConfig}
+          settings={mockSettings}
+          version={mockVersion}
+        />,
+      );
+
+      // Wait for the UI to update
+      await waitFor(() => {
+        expect(lastFrame()).not.toContain('Do you trust this folder?');
+        expect(vi.mocked(Tips)).toHaveBeenCalled();
+      });
+    });
+
     it('should not display the folder trust dialog when the feature is disabled', async () => {
       const { useFolderTrust } = await import('./hooks/useFolderTrust.js');
       vi.mocked(useFolderTrust).mockReturnValue({
