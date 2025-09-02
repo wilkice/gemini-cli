@@ -359,7 +359,6 @@ class Session {
       return [
         {
           functionResponse: {
-            id: callId,
             name: fc.name ?? '',
             response: { error: error.message },
           },

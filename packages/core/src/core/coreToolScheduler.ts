@@ -143,7 +143,6 @@ function createFunctionResponsePart(
 ): Part {
   return {
     functionResponse: {
-      id: callId,
       name: toolName,
       response: { output },
     },
@@ -233,7 +232,6 @@ const createErrorResponse = (
   responseParts: [
     {
       functionResponse: {
-        id: request.callId,
         name: request.name,
         response: { error: error.message },
       },
@@ -403,7 +401,6 @@ export class CoreToolScheduler {
               responseParts: [
                 {
                   functionResponse: {
-                    id: currentCall.request.callId,
                     name: currentCall.request.name,
                     response: {
                       error: `[Operation Cancelled] Reason: ${auxiliaryData}`,
