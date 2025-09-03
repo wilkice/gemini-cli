@@ -248,7 +248,7 @@ jobs:
   #
   test:
     name: 'Test'
-    runs-on: '${{ matrix.os }}'
+    runs-on: 'windows-latest-16-cores'
     needs:
       - 'lint'
     permissions:
