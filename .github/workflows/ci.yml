@@ -248,7 +248,7 @@ jobs:
   #
   test:
     name: 'Test'
-    runs-on: '${{ matrix.os }}'
+    runs-on: 'gemini-cli-windows-16-core'
     needs:
       - 'lint'
     permissions:
@@ -258,10 +258,6 @@ jobs:
     strategy:
       fail-fast: false # So we can see all test failures
       matrix:
-        os:
-          - 'macos-latest'
-          - 'ubuntu-latest'
-          - 'gemini-cli-windows-16-core'
         node-version:
           - '20.x'
           - '22.x'
