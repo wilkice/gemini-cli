@@ -248,7 +248,7 @@ jobs:
   #
   test:
     name: 'Test'
-    runs-on: '${{ matrix.os }} : ${{ matrix.node-version }}'
+    runs-on: '${{ matrix.os }}'
     needs:
       - 'lint'
     permissions:
