@@ -248,7 +248,7 @@ jobs:
   #
   test:
     name: 'Test'
-    runs-on: 'gemini-cli-windows-16-core'
+    runs-on: 'windows-latest-16-cores'
     needs:
       - 'lint'
     permissions:
