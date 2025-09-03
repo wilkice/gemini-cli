@@ -790,17 +790,18 @@ export class MCPOAuthProvider {
 
     // Save token
     try {
-      await MCPOAuthTokenStorage.saveToken(
+      await MCPOAuthTokenStorage.setCredentials({
         serverName,
         token,
-        config.clientId,
-        config.tokenUrl,
+        clientId: config.clientId,
+        tokenUrl: config.tokenUrl,
         mcpServerUrl,
-      );
+        updatedAt: Date.now(),
+    });
       console.log('Authentication successful! Token saved.');
 
       // Verify token was saved
-      const savedToken = await MCPOAuthTokenStorage.getToken(serverName);
+      const savedToken = await MCPOAuthTokenStorage.getCredentials(serverName);
       if (savedToken && savedToken.token && savedToken.token.accessToken) {
         const tokenPreview =
           savedToken.token.accessToken.length > 20
@@ -832,7 +833,7 @@ export class MCPOAuthProvider {
     config: MCPOAuthConfig,
   ): Promise<string | null> {
     console.debug(`Getting valid token for server: ${serverName}`);
-    const credentials = await MCPOAuthTokenStorage.getToken(serverName);
+    const credentials = await MCPOAuthTokenStorage.getCredentials(serverName);
 
     if (!credentials) {
       console.debug(`No credentials found for server: ${serverName}`);
@@ -874,19 +875,20 @@ export class MCPOAuthProvider {
           newToken.expiresAt = Date.now() + newTokenResponse.expires_in * 1000;
         }
 
-        await MCPOAuthTokenStorage.saveToken(
+        await MCPOAuthTokenStorage.setCredentials({
           serverName,
-          newToken,
-          config.clientId,
-          credentials.tokenUrl,
-          credentials.mcpServerUrl,
-        );
+          token: newToken,
+          clientId: config.clientId,
+          tokenUrl: credentials.tokenUrl,
+          mcpServerUrl: credentials.mcpServerUrl,
+          updatedAt: Date.now(),
+      });
 
         return newToken.accessToken;
       } catch (error) {
         console.error(`Failed to refresh token: ${getErrorMessage(error)}`);
         // Remove invalid token
-        await MCPOAuthTokenStorage.removeToken(serverName);
+        await MCPOAuthTokenStorage.deleteCredentials(serverName);
       }
     }
 
