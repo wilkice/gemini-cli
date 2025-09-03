@@ -248,7 +248,7 @@ jobs:
   #
   test:
     name: 'Test'
-    runs-on: 'windows-latest-16-cores'
+    runs-on: '${{ matrix.os }}'
     needs:
       - 'lint'
     permissions:
@@ -261,7 +261,7 @@ jobs:
         os:
           - 'macos-latest'
           - 'ubuntu-latest'
-          - 'windows-latest'
+          - 'windows-latest-16-cores'
         node-version:
           - '20.x'
           - '22.x'
