@@ -89,6 +89,7 @@ interface PKCEParams {
  * Provider for handling OAuth authentication for MCP servers.
  */
 export class MCPOAuthProvider {
+  private readonly oAuthTokenStorage = new MCPOAuthTokenStorage();
   private static readonly REDIRECT_PORT = 7777;
   private static readonly REDIRECT_PATH = '/oauth/callback';
   private static readonly HTTP_OK = 200;
@@ -790,7 +791,7 @@ export class MCPOAuthProvider {
 
     // Save token
     try {
-      await MCPOAuthTokenStorage.setCredentials({
+      await this.oAuthTokenStorage.setCredentials({
         serverName,
         token,
         clientId: config.clientId,
@@ -801,7 +802,7 @@ export class MCPOAuthProvider {
       console.log('Authentication successful! Token saved.');
 
       // Verify token was saved
-      const savedToken = await MCPOAuthTokenStorage.getCredentials(serverName);
+      const savedToken = await this.oAuthTokenStorage.getCredentials(serverName);
       if (savedToken && savedToken.token && savedToken.token.accessToken) {
         const tokenPreview =
           savedToken.token.accessToken.length > 20
@@ -833,7 +834,7 @@ export class MCPOAuthProvider {
     config: MCPOAuthConfig,
   ): Promise<string | null> {
     console.debug(`Getting valid token for server: ${serverName}`);
-    const credentials = await MCPOAuthTokenStorage.getCredentials(serverName);
+    const credentials = await this.oAuthTokenStorage.getCredentials(serverName);
 
     if (!credentials) {
       console.debug(`No credentials found for server: ${serverName}`);
@@ -875,7 +876,7 @@ export class MCPOAuthProvider {
           newToken.expiresAt = Date.now() + newTokenResponse.expires_in * 1000;
         }
 
-        await MCPOAuthTokenStorage.setCredentials({
+        await this.oAuthTokenStorage.setCredentials({
           serverName,
           token: newToken,
           clientId: config.clientId,
@@ -888,7 +889,7 @@ export class MCPOAuthProvider {
       } catch (error) {
         console.error(`Failed to refresh token: ${getErrorMessage(error)}`);
         // Remove invalid token
-        await MCPOAuthTokenStorage.deleteCredentials(serverName);
+        await this.oAuthTokenStorage.deleteCredentials(serverName);
       }
     }
 
