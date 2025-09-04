@@ -211,7 +211,7 @@ export class TestRig {
     const commandArgs = parse(command);
     const node = commandArgs.shift() as string;
 
-    const child = spawn(node, commandArgs as string[], {
+    const child = spawn(node, [`"${this.bundlePath}"`, ...commandArgs as string[]], {
       cwd: this.testDir!,
       stdio: 'pipe',
     });
