@@ -16,7 +16,6 @@ import {
 import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import {
   getDialogSettingKeys,
-  getSettingValue,
   setPendingSettingValue,
   getDisplayValue,
   hasRestartRequiredSettings,
@@ -28,11 +27,16 @@ import {
   getDefaultValue,
   setPendingSettingValueAny,
   getNestedValue,
+  getEffectiveValue,
 } from '../../utils/settingsUtils.js';
 import { useVimMode } from '../contexts/VimModeContext.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import chalk from 'chalk';
 import { cpSlice, cpLen, stripUnsafeCharacters } from '../utils/textUtils.js';
+import {
+  type SettingsValue,
+  TOGGLE_TYPES,
+} from '../../config/settingsSchema.js';
 
 interface SettingsDialogProps {
   settings: LoadedSettings;
@@ -122,15 +126,31 @@ export function SettingsDialog({
         value: key,
         type: definition?.type,
         toggle: () => {
-          if (definition?.type !== 'boolean') {
-            // For non-boolean items, toggle will be handled via edit mode.
+          if (!TOGGLE_TYPES.has(definition?.type)) {
             return;
           }
-          const currentValue = getSettingValue(key, pendingSettings, {});
-          const newValue = !currentValue;
+          const currentValue = getEffectiveValue(key, pendingSettings, {});
+          let newValue: SettingsValue;
+          if (definition?.type === 'boolean') {
+            newValue = !(currentValue as boolean);
+            setPendingSettings((prev) =>
+              setPendingSettingValue(key, newValue as boolean, prev),
+            );
+          } else {
+            const enumKeys = Object.keys(definition?.enumValues ?? {});
+            const currentIndex = enumKeys.indexOf(currentValue as string);
+            if (currentIndex !== -1 && currentIndex < enumKeys.length - 1) {
+              newValue = enumKeys[currentIndex + 1];
+            } else {
+              newValue = enumKeys[0]; // loop back to start.
+            }
+            setPendingSettings((prev) =>
+              setPendingSettingValueAny(key, newValue as boolean, prev),
+            );
+          }
 
           setPendingSettings((prev) =>
-            setPendingSettingValue(key, newValue, prev),
+            setPendingSettingValue(key, newValue as boolean, prev),
           );
 
           if (!requiresRestart(key)) {
