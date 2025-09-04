@@ -39,6 +39,17 @@ export const TOGGLE_TYPES: ReadonlySet<SettingsType | undefined> = new Set([
   'enum',
 ]);
 
+export enum MergeStrategy {
+  // Replace the old value with the new value. This is the default.
+  REPLACE = 'replace',
+  // Concatenate arrays.
+  CONCAT = 'concat',
+  // Merge arrays, ensuring unique values.
+  UNION = 'union',
+  // Shallow merge objects.
+  SHALLOW_MERGE = 'shallow_merge',
+}
+
 export interface SettingDefinition {
   type: SettingsType;
   label: string;
@@ -53,6 +64,7 @@ export interface SettingDefinition {
   key?: string;
   properties?: SettingsSchema;
   showInDialog?: boolean;
+  mergeStrategy?: MergeStrategy;
 }
 
 export interface SettingsSchema {
@@ -77,6 +89,7 @@ const SETTINGS_SCHEMA = {
     default: {} as Record<string, MCPServerConfig>,
     description: 'Configuration for MCP servers.',
     showInDialog: false,
+    mergeStrategy: MergeStrategy.SHALLOW_MERGE,
   },
 
   general: {
@@ -220,6 +233,55 @@ const SETTINGS_SCHEMA = {
         description: 'Hide the application banner',
         showInDialog: true,
       },
+      hideContextSummary: {
+        type: 'boolean',
+        label: 'Hide Context Summary',
+        category: 'UI',
+        requiresRestart: false,
+        default: false,
+        description:
+          'Hide the context summary (GEMINI.md, MCP servers) above the input.',
+        showInDialog: true,
+      },
+      footer: {
+        type: 'object',
+        label: 'Footer',
+        category: 'UI',
+        requiresRestart: false,
+        default: {},
+        description: 'Settings for the footer.',
+        showInDialog: false,
+        properties: {
+          hideCWD: {
+            type: 'boolean',
+            label: 'Hide CWD',
+            category: 'UI',
+            requiresRestart: false,
+            default: false,
+            description:
+              'Hide the current working directory path in the footer.',
+            showInDialog: true,
+          },
+          hideSandboxStatus: {
+            type: 'boolean',
+            label: 'Hide Sandbox Status',
+            category: 'UI',
+            requiresRestart: false,
+            default: false,
+            description: 'Hide the sandbox status indicator in the footer.',
+            showInDialog: true,
+          },
+          hideModelInfo: {
+            type: 'boolean',
+            label: 'Hide Model Info',
+            category: 'UI',
+            requiresRestart: false,
+            default: false,
+            description: 'Hide the model name and context usage in the footer.',
+            showInDialog: true,
+          },
+        },
+      },
       hideFooter: {
         type: 'boolean',
         label: 'Hide Footer',
@@ -256,6 +318,15 @@ const SETTINGS_SCHEMA = {
         description: 'Show citations for generated text in the chat.',
         showInDialog: true,
       },
+      customWittyPhrases: {
+        type: 'array',
+        label: 'Custom Witty Phrases',
+        category: 'UI',
+        requiresRestart: false,
+        default: [] as string[],
+        description: 'Custom witty phrases to display during loading.',
+        showInDialog: false,
+      },
       accessibility: {
         type: 'object',
         label: 'Accessibility',
@@ -279,7 +350,7 @@ const SETTINGS_SCHEMA = {
             label: 'Screen Reader Mode',
             category: 'UI',
             requiresRestart: true,
-            default: false,
+            default: undefined as boolean | undefined,
             description:
               'Render output in plain-text to be more screen reader accessible',
             showInDialog: true,
@@ -403,7 +474,7 @@ const SETTINGS_SCHEMA = {
         label: 'Skip Next Speaker Check',
         category: 'Model',
         requiresRestart: false,
-        default: false,
+        default: true,
         description: 'Skip the next speaker check.',
         showInDialog: true,
       },
@@ -455,6 +526,7 @@ const SETTINGS_SCHEMA = {
         description:
           'Additional directories to include in the workspace context. Missing directories will be skipped with a warning.',
         showInDialog: false,
+        mergeStrategy: MergeStrategy.CONCAT,
       },
       loadMemoryFromIncludeDirectories: {
         type: 'boolean',
@@ -544,6 +616,16 @@ const SETTINGS_SCHEMA = {
           'Use node-pty for shell command execution. Fallback to child_process still applies.',
         showInDialog: true,
       },
+      autoAccept: {
+        type: 'boolean',
+        label: 'Auto Accept',
+        category: 'Tools',
+        requiresRestart: false,
+        default: false,
+        description:
+          'Automatically accept and execute tool calls that are considered safe (e.g., read-only operations).',
+        showInDialog: true,
+      },
       core: {
         type: 'array',
         label: 'Core Tools',
@@ -627,7 +709,7 @@ const SETTINGS_SCHEMA = {
         category: 'MCP',
         requiresRestart: true,
         default: undefined as string[] | undefined,
-        description: 'A whitelist of MCP servers to allow.',
+        description: 'A list of MCP servers to allow.',
         showInDialog: false,
       },
       excluded: {
@@ -636,12 +718,20 @@ const SETTINGS_SCHEMA = {
         category: 'MCP',
         requiresRestart: true,
         default: undefined as string[] | undefined,
-        description: 'A blacklist of MCP servers to exclude.',
+        description: 'A list of MCP servers to exclude.',
         showInDialog: false,
       },
     },
   },
-
+  useSmartEdit: {
+    type: 'boolean',
+    label: 'Use Smart Edit',
+    category: 'Advanced',
+    requiresRestart: false,
+    default: false,
+    description: 'Enable the smart-edit tool instead of the replace tool.',
+    showInDialog: false,
+  },
   security: {
     type: 'object',
     label: 'Security',
@@ -660,20 +750,11 @@ const SETTINGS_SCHEMA = {
         description: 'Settings for folder trust.',
         showInDialog: false,
         properties: {
-          featureEnabled: {
-            type: 'boolean',
-            label: 'Folder Trust Feature',
-            category: 'Security',
-            requiresRestart: false,
-            default: false,
-            description: 'Enable folder trust feature for enhanced security.',
-            showInDialog: true,
-          },
           enabled: {
             type: 'boolean',
             label: 'Folder Trust',
             category: 'Security',
-            requiresRestart: false,
+            requiresRestart: true,
             default: false,
             description: 'Setting to track whether Folder trust is enabled.',
             showInDialog: true,
@@ -696,6 +777,16 @@ const SETTINGS_SCHEMA = {
             requiresRestart: true,
             default: undefined as AuthType | undefined,
             description: 'The currently selected authentication type.',
+            showInDialog: false,
+          },
+          enforcedType: {
+            type: 'string',
+            label: 'Enforced Auth Type',
+            category: 'Advanced',
+            requiresRestart: true,
+            default: undefined as AuthType | undefined,
+            description:
+              'The required auth type. If this does not match the selected auth type, the user will be prompted to re-authenticate.',
             showInDialog: false,
           },
           useExternal: {
@@ -747,6 +838,7 @@ const SETTINGS_SCHEMA = {
         default: ['DEBUG', 'DEBUG_MODE'] as string[],
         description: 'Environment variables to exclude from project context.',
         showInDialog: false,
+        mergeStrategy: MergeStrategy.UNION,
       },
       bugCommand: {
         type: 'object',
@@ -798,6 +890,7 @@ const SETTINGS_SCHEMA = {
         default: [] as string[],
         description: 'List of disabled extensions.',
         showInDialog: false,
+        mergeStrategy: MergeStrategy.UNION,
       },
       workspacesWithMigrationNudge: {
         type: 'array',
@@ -808,6 +901,7 @@ const SETTINGS_SCHEMA = {
         description:
           'List of workspaces for which the migration nudge has been shown.',
         showInDialog: false,
+        mergeStrategy: MergeStrategy.UNION,
       },
     },
   },
@@ -828,3 +922,9 @@ type InferSettings<T extends SettingsSchema> = {
 };
 
 export type Settings = InferSettings<SettingsSchemaType>;
+
+export interface FooterSettings {
+  hideCWD?: boolean;
+  hideSandboxStatus?: boolean;
+  hideModelInfo?: boolean;
+}

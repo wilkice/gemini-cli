@@ -50,6 +50,50 @@ enum TerminalKeys {
   ESCAPE = '\u001B',
 }
 
+const createMockSettings = (
+  userSettings = {},
+  systemSettings = {},
+  workspaceSettings = {},
+) =>
+  new LoadedSettings(
+    {
+      settings: { ui: { customThemes: {} }, mcpServers: {}, ...systemSettings },
+      path: '/system/settings.json',
+    },
+    {
+      settings: {},
+      path: '/system/system-defaults.json',
+    },
+    {
+      settings: {
+        ui: { customThemes: {} },
+        mcpServers: {},
+        ...userSettings,
+      },
+      path: '/user/settings.json',
+    },
+    {
+      settings: {
+        ui: { customThemes: {} },
+        mcpServers: {},
+        ...workspaceSettings,
+      },
+      path: '/workspace/settings.json',
+    },
+    [],
+    true,
+    new Set(),
+  );
+
+vi.mock('../contexts/SettingsContext.js', async () => {
+  const actual = await vi.importActual('../contexts/SettingsContext.js');
+  let settings = createMockSettings({ 'a.string.setting': 'initial' });
+  return {
+    ...original,
+    getSettingsSchema: vi.fn(original.getSettingsSchema),
+  };
+});
+
 vi.mock('../../config/settingsSchema.js', async (importOriginal) => {
   const original =
     await importOriginal<typeof import('../../config/settingsSchema.js')>();
@@ -123,46 +167,6 @@ describe('SettingsDialog', () => {
     // console.log = originalConsoleLog;
     // console.error = originalConsoleError;
   });
-
-  function createMockSettings(
-    userSettings = {},
-    systemSettings = {},
-    workspaceSettings = {},
-  ): LoadedSettings {
-    return new LoadedSettings(
-      {
-        settings: {
-          ui: { customThemes: {} },
-          mcpServers: {},
-          ...systemSettings,
-        },
-        path: '/system/settings.json',
-      },
-      {
-        settings: {},
-        path: '/system/system-defaults.json',
-      },
-      {
-        settings: {
-          ui: { customThemes: {} },
-          mcpServers: {},
-          ...userSettings,
-        },
-        path: '/user/settings.json',
-      },
-      {
-        settings: {
-          ui: { customThemes: {} },
-          mcpServers: {},
-          ...workspaceSettings,
-        },
-        path: '/workspace/settings.json',
-      },
-      [],
-      true,
-      new Set(),
-    );
-  }
 
   describe('Initial Rendering', () => {
     it('should render the settings dialog with default state', () => {
