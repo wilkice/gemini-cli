@@ -627,12 +627,12 @@ describe('SettingsUtils', () => {
       it('should set top-level setting value', () => {
         const pendingSettings = makeMockSettings({});
         const result = setPendingSettingValue(
-          'ui.requiresRestart',
+          'ui.hideWindowTitle',
           true,
           pendingSettings,
         );
 
-        expect(result.ui?.requiresRestart).toBe(true);
+        expect(result.ui?.hideWindowTitle).toBe(true);
       });
 
       it('should set nested setting value', () => {
