@@ -89,8 +89,22 @@ vi.mock('../contexts/SettingsContext.js', async () => {
   const actual = await vi.importActual('../contexts/SettingsContext.js');
   let settings = createMockSettings({ 'a.string.setting': 'initial' });
   return {
-    ...original,
-    getSettingsSchema: vi.fn(original.getSettingsSchema),
+    ...actual,
+    useSettings: () => ({
+      settings,
+      setSetting: (key: string, value: string) => {
+        settings = createMockSettings({ [key]: value });
+      },
+      getSettingDefinition: (key: string) => {
+        if (key === 'a.string.setting') {
+          return {
+            type: 'string',
+            description: 'A string setting',
+          };
+        }
+        return undefined;
+      },
+    }),
   };
 });
 

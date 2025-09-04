@@ -145,7 +145,7 @@ export function SettingsDialog({
               newValue = enumKeys[0]; // loop back to start.
             }
             setPendingSettings((prev) =>
-              setPendingSettingValueAny(key, newValue as boolean, prev),
+              setPendingSettingValueAny(key, newValue, prev),
             );
           }
 
