@@ -316,7 +316,7 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     // of the static content to ensure the Tips are hidden/shown correctly.
     refreshStatic();
   }, [isFolderTrustDialogOpen, refreshStatic]);
-  
+
   const { needsRestart: ideNeedsRestart } = useIdeTrustListener(config);
   useEffect(() => {
     if (ideNeedsRestart) {
