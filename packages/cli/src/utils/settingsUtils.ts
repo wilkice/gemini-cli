@@ -440,25 +440,19 @@ export function getDisplayValue(
     value = getEffectiveValue(key, settings, {});
   } else {
     // Fall back to the schema default when the key is unset in this scope
-    const defaultValue = getDefaultValue(key);
-    if (TOGGLE_TYPES.has(definition?.type)) {
-      value = defaultValue;
-    } else {
-      value = false;
-    }
+    value = getDefaultValue(key);
   }
 
-  if (definition?.type === 'enum') {
-    value =
-      definition?.enumValues?.[value as unknown as string | number] ?? value;
-  }
+  let valueString = String(value);
 
-  const valueString = String(value);
+  if (definition?.type === 'enum' && definition.options) {
+    const option = definition.options?.find((option) => option.value === value);
+    valueString = option?.label ?? `${value}`;
+  }
 
   // Check if value is different from default OR if it's in modified settings OR if there are pending changes
   const defaultValue = getDefaultValue(key);
-  const isChangedFromDefault =
-    typeof defaultValue === 'boolean' ? value !== defaultValue : value === true;
+  const isChangedFromDefault = value !== defaultValue;
   const isInModifiedSettings = modifiedSettings.has(key);
 
   // Mark as modified if setting exists in current scope OR is in modified settings

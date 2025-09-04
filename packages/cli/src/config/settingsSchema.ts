@@ -39,6 +39,11 @@ export const TOGGLE_TYPES: ReadonlySet<SettingsType | undefined> = new Set([
   'enum',
 ]);
 
+interface SettingEnumOption {
+  value: string | number;
+  label: string;
+}
+
 export enum MergeStrategy {
   // Replace the old value with the new value. This is the default.
   REPLACE = 'replace',
@@ -53,8 +58,6 @@ export enum MergeStrategy {
 export interface SettingDefinition {
   type: SettingsType;
   label: string;
-  /** a map key'd by enum, with the map value being the label shown to the user  */
-  enumValues?: Record<string | number, string>;
   category: string;
   requiresRestart: boolean;
   default: SettingsValue;
@@ -65,6 +68,8 @@ export interface SettingDefinition {
   properties?: SettingsSchema;
   showInDialog?: boolean;
   mergeStrategy?: MergeStrategy;
+  /** Enum type options  */
+  options?: readonly SettingEnumOption[];
 }
 
 export interface SettingsSchema {

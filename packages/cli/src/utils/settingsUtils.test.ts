@@ -727,11 +727,20 @@ describe('SettingsUtils', () => {
         const SETTING: SettingDefinition = {
           type: 'enum',
           label: 'Theme',
-          enumValues: {
-            [StringEnum.FOO]: 'Foo',
-            [StringEnum.BAR]: 'Bar',
-            [StringEnum.BAZ]: 'Baz',
-          },
+          options: [
+            {
+              value: StringEnum.FOO,
+              label: 'Foo',
+            },
+            {
+              value: StringEnum.BAR,
+              label: 'Bar',
+            },
+            {
+              value: StringEnum.BAZ,
+              label: 'Baz',
+            },
+          ],
           category: 'UI',
           requiresRestart: false,
           default: StringEnum.BAR,
@@ -745,11 +754,20 @@ describe('SettingsUtils', () => {
               properties: {
                 theme: {
                   ...SETTING,
-                  enumValues: {
-                    [NumberEnum.ONE]: 'One',
-                    [NumberEnum.TWO]: 'Two',
-                    [NumberEnum.THREE]: 'Three',
-                  },
+                  options: [
+                    {
+                      value: NumberEnum.ONE,
+                      label: 'One',
+                    },
+                    {
+                      value: NumberEnum.TWO,
+                      label: 'Two',
+                    },
+                    {
+                      value: NumberEnum.THREE,
+                      label: 'Three',
+                    },
+                  ],
                 },
               },
             },
@@ -780,11 +798,20 @@ describe('SettingsUtils', () => {
                 theme: {
                   ...SETTING,
                   default: NumberEnum.THREE,
-                  enumValues: {
-                    [NumberEnum.ONE]: 'One',
-                    [NumberEnum.TWO]: 'Two',
-                    [NumberEnum.THREE]: 'Three',
-                  },
+                  options: [
+                    {
+                      value: NumberEnum.ONE,
+                      label: 'One',
+                    },
+                    {
+                      value: NumberEnum.TWO,
+                      label: 'Two',
+                    },
+                    {
+                      value: NumberEnum.THREE,
+                      label: 'Three',
+                    },
+                  ],
                 },
               },
             },

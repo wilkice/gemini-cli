@@ -80,33 +80,9 @@ const createMockSettings = (
       },
       path: '/workspace/settings.json',
     },
-    [],
     true,
     new Set(),
   );
-
-vi.mock('../contexts/SettingsContext.js', async () => {
-  const actual = await vi.importActual('../contexts/SettingsContext.js');
-  let settings = createMockSettings({ 'a.string.setting': 'initial' });
-  return {
-    ...actual,
-    useSettings: () => ({
-      settings,
-      setSetting: (key: string, value: string) => {
-        settings = createMockSettings({ [key]: value });
-      },
-      getSettingDefinition: (key: string) => {
-        if (key === 'a.string.setting') {
-          return {
-            type: 'string',
-            description: 'A string setting',
-          };
-        }
-        return undefined;
-      },
-    }),
-  };
-});
 
 vi.mock('../../config/settingsSchema.js', async (importOriginal) => {
   const original =
@@ -355,11 +331,20 @@ describe('SettingsDialog', () => {
       const SETTING: SettingDefinition = {
         type: 'enum',
         label: 'Theme',
-        enumValues: {
-          [StringEnum.FOO]: 'Foo',
-          [StringEnum.BAR]: 'Bar',
-          [StringEnum.BAZ]: 'Baz',
-        },
+        options: [
+          {
+            label: 'Foo',
+            value: StringEnum.FOO,
+          },
+          {
+            label: 'Bar',
+            value: StringEnum.BAR,
+          },
+          {
+            label: 'Baz',
+            value: StringEnum.BAZ,
+          },
+        ],
         category: 'UI',
         requiresRestart: false,
         default: StringEnum.BAR,

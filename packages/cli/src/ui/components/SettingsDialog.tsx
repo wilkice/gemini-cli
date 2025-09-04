@@ -126,6 +126,7 @@ export function SettingsDialog({
         value: key,
         type: definition?.type,
         toggle: () => {
+          console.log(definition?.type);
           if (!TOGGLE_TYPES.has(definition?.type)) {
             return;
           }
@@ -136,13 +137,15 @@ export function SettingsDialog({
             setPendingSettings((prev) =>
               setPendingSettingValue(key, newValue as boolean, prev),
             );
-          } else {
-            const enumKeys = Object.keys(definition?.enumValues ?? {});
-            const currentIndex = enumKeys.indexOf(currentValue as string);
-            if (currentIndex !== -1 && currentIndex < enumKeys.length - 1) {
-              newValue = enumKeys[currentIndex + 1];
+          } else if (definition?.type === 'enum' && definition.options) {
+            const options = definition.options;
+            const currentIndex = options?.findIndex(
+              (opt) => opt.value === currentValue,
+            );
+            if (currentIndex !== -1 && currentIndex < options.length - 1) {
+              newValue = options[currentIndex + 1].value;
             } else {
-              newValue = enumKeys[0]; // loop back to start.
+              newValue = options[0].value; // loop back to start.
             }
             setPendingSettings((prev) =>
               setPendingSettingValueAny(key, newValue, prev),
