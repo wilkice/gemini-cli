@@ -481,7 +481,6 @@ describe('Settings Loading and Merging', () => {
         mcp: {
           allowed: ['server1', 'server2'],
         },
-<<<<<<< HEAD
         advanced: {
           excludedEnvVars: [],
         },
@@ -497,8 +496,6 @@ describe('Settings Loading and Merging', () => {
         general: {},
         privacy: {},
         ide: {},
-=======
->>>>>>> origin/main
       });
     });
 
@@ -566,7 +563,6 @@ describe('Settings Loading and Merging', () => {
           allowed: ['legacy-server-1'],
         },
         someUnrecognizedSetting: 'should-be-preserved',
-<<<<<<< HEAD
         advanced: {
           excludedEnvVars: [],
         },
@@ -579,8 +575,6 @@ describe('Settings Loading and Merging', () => {
         telemetry: {},
         tools: {},
         ide: {},
-=======
->>>>>>> origin/main
       });
     });
 
@@ -719,7 +713,6 @@ describe('Settings Loading and Merging', () => {
             '/system/dir',
           ],
         },
-<<<<<<< HEAD
         extensions: {
           disabled: [],
           workspacesWithMigrationNudge: [],
@@ -731,9 +724,6 @@ describe('Settings Loading and Merging', () => {
         },
         security: {},
         telemetry: {},
-=======
-        telemetry: false,
->>>>>>> origin/main
         tools: {
           sandbox: false,
         },
@@ -1023,15 +1013,9 @@ describe('Settings Loading and Merging', () => {
       (mockFsExistsSync as Mock).mockReturnValue(false); // No settings files exist
       (fs.readFileSync as Mock).mockReturnValue('{}');
       const settings = loadSettings(MOCK_WORKSPACE_DIR);
-<<<<<<< HEAD
       expect(settings.merged.telemetry).toEqual({});
       expect(settings.merged.ui?.customThemes).toEqual({});
       expect(settings.merged.mcpServers).toEqual({});
-=======
-      expect(settings.merged.telemetry).toBeUndefined();
-      expect(settings.merged.ui).toBeUndefined();
-      expect(settings.merged.mcpServers).toBeUndefined();
->>>>>>> origin/main
     });
 
     it('should merge MCP servers correctly, with workspace taking precedence', () => {
@@ -1457,7 +1441,6 @@ describe('Settings Loading and Merging', () => {
         },
       );
 
-<<<<<<< HEAD
       const settings = loadSettings(MOCK_WORKSPACE_DIR);
 
       // Check that settings are empty due to parsing errors
@@ -1506,24 +1489,6 @@ describe('Settings Loading and Merging', () => {
       );
       expect(workspaceError).toBeDefined();
       expect(workspaceError?.message).toBe(workspaceReadError.message);
-=======
-      try {
-        loadSettings(MOCK_WORKSPACE_DIR);
-        fail('loadSettings should have thrown a FatalConfigError');
-      } catch (e) {
-        expect(e).toBeInstanceOf(FatalConfigError);
-        const error = e as FatalConfigError;
-        expect(error.message).toContain(
-          `Error in ${USER_SETTINGS_PATH}: ${userReadError.message}`,
-        );
-        expect(error.message).toContain(
-          `Error in ${MOCK_WORKSPACE_SETTINGS_PATH}: ${workspaceReadError.message}`,
-        );
-        expect(error.message).toContain(
-          'Please fix the configuration file(s) and try again.',
-        );
-      }
->>>>>>> origin/main
 
       // Restore JSON.parse mock if it was spied on specifically for this test
       vi.restoreAllMocks(); // Or more targeted restore if needed
@@ -1914,7 +1879,6 @@ describe('Settings Loading and Merging', () => {
         expect(settings.system.settings).toEqual(systemSettingsContent);
         expect(settings.merged).toEqual({
           ...systemSettingsContent,
-<<<<<<< HEAD
           ui: {
             ...systemSettingsContent.ui,
             customThemes: {},
@@ -1939,8 +1903,6 @@ describe('Settings Loading and Merging', () => {
           privacy: {},
           telemetry: {},
           ide: {},
-=======
->>>>>>> origin/main
         });
       });
     });

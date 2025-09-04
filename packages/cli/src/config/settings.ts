@@ -106,16 +106,10 @@ const MIGRATION_MAP: Record<string, string> = {
   sandbox: 'tools.sandbox',
   selectedAuthType: 'security.auth.selectedType',
   shouldUseNodePtyShell: 'tools.usePty',
-<<<<<<< HEAD
-  allowedTools: 'tools.allowed',
-  coreTools: 'tools.core',
-  excludeTools: 'tools.exclude',
-=======
   skipNextSpeakerCheck: 'model.skipNextSpeakerCheck',
   summarizeToolOutput: 'model.summarizeToolOutput',
   telemetry: 'telemetry',
   theme: 'ui.theme',
->>>>>>> origin/main
   toolDiscoveryCommand: 'tools.discoveryCommand',
   toolCallCommand: 'tools.callCommand',
   usageStatisticsEnabled: 'privacy.usageStatisticsEnabled',
@@ -353,7 +347,6 @@ function mergeSettings(
   // 2. User Settings
   // 3. Workspace Settings
   // 4. System Settings (as overrides)
-<<<<<<< HEAD
   //
   // For properties that are arrays (e.g., includeDirectories), the arrays
   // are concatenated. For objects (e.g., customThemes), they are merged.
@@ -484,16 +477,6 @@ function mergeSettings(
       ],
     },
   };
-=======
-  return customDeepMerge(
-    getMergeStrategyForPath,
-    {}, // Start with an empty object
-    systemDefaults,
-    user,
-    safeWorkspaceWithoutFolderTrust,
-    system,
-  ) as Settings;
->>>>>>> origin/main
 }
 
 export class LoadedSettings {
