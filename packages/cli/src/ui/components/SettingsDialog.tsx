@@ -126,7 +126,6 @@ export function SettingsDialog({
         value: key,
         type: definition?.type,
         toggle: () => {
-          console.log(definition?.type);
           if (!TOGGLE_TYPES.has(definition?.type)) {
             return;
           }
