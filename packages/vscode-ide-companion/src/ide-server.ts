@@ -238,7 +238,7 @@ export class IDEServer {
           this.port = address.port;
           this.portFile = path.join(
             os.tmpdir(),
-            `gemini-ide-server-${this.port}.json`,
+            `gemini-ide-server-${process.ppid}-${this.port}.json`,
           );
           this.ppidPortFile = path.join(
             os.tmpdir(),
