@@ -124,7 +124,7 @@ describe('IDEServer', () => {
     const port = getPortFromMock(replaceMock);
     const expectedPortFile = path.join(
       '/tmp',
-      `gemini-ide-server-${port}.json`,
+      `gemini-ide-server-${process.ppid}-${port}.json`,
     );
     const expectedPpidPortFile = path.join(
       '/tmp',
@@ -159,7 +159,7 @@ describe('IDEServer', () => {
     const port = getPortFromMock(replaceMock);
     const expectedPortFile = path.join(
       '/tmp',
-      `gemini-ide-server-${port}.json`,
+      `gemini-ide-server-${process.ppid}-${port}.json`,
     );
     const expectedPpidPortFile = path.join(
       '/tmp',
@@ -194,7 +194,7 @@ describe('IDEServer', () => {
     const port = getPortFromMock(replaceMock);
     const expectedPortFile = path.join(
       '/tmp',
-      `gemini-ide-server-${port}.json`,
+      `gemini-ide-server-${process.ppid}-${port}.json`,
     );
     const expectedPpidPortFile = path.join(
       '/tmp',
@@ -243,7 +243,7 @@ describe('IDEServer', () => {
     const port = getPortFromMock(replaceMock);
     const expectedPortFile = path.join(
       '/tmp',
-      `gemini-ide-server-${port}.json`,
+      `gemini-ide-server-${process.ppid}-${port}.json`,
     );
     const expectedPpidPortFile = path.join(
       '/tmp',
@@ -290,7 +290,10 @@ describe('IDEServer', () => {
     await ideServer.start(mockContext);
     const replaceMock = mockContext.environmentVariableCollection.replace;
     const port = getPortFromMock(replaceMock);
-    const portFile = path.join('/tmp', `gemini-ide-server-${port}.json`);
+    const portFile = path.join(
+      '/tmp',
+      `gemini-ide-server-${process.ppid}-${port}.json`,
+    );
     const ppidPortFile = path.join(
       '/tmp',
       `gemini-ide-server-${process.ppid}.json`,
@@ -325,7 +328,7 @@ describe('IDEServer', () => {
       const port = getPortFromMock(replaceMock);
       const expectedPortFile = path.join(
         '/tmp',
-        `gemini-ide-server-${port}.json`,
+        `gemini-ide-server-${process.ppid}-${port}.json`,
       );
       const expectedPpidPortFile = path.join(
         '/tmp',
