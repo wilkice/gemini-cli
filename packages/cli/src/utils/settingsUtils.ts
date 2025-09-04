@@ -16,7 +16,7 @@ import type {
   SettingsType,
   SettingsValue,
 } from '../config/settingsSchema.js';
-import { getSettingsSchema, TOGGLE_TYPES } from '../config/settingsSchema.js';
+import { getSettingsSchema } from '../config/settingsSchema.js';
 
 // The schema is now nested, but many parts of the UI and logic work better
 // with a flattened structure and dot-notation keys. This section flattens the
