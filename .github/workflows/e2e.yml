@@ -82,4 +82,4 @@ jobs:
           SANDBOX: '${{ matrix.sandbox }}'
           VERBOSE: 'true'
         run: |-
-          npm run "test:integration:${SANDBOX}"
+          npm run "test:integration:${{ matrix.sandbox }}"
