@@ -192,82 +192,80 @@ export function ThemeDialog({
       paddingRight={1}
       width="100%"
     >
-      <Box flexDirection="row">
-        {/* Left Column: Selection */}
-        <Box flexDirection="column" width="45%" paddingRight={2}>
-          {mode === 'theme' ? (
-            <>
-              <Text bold={mode === 'theme'} wrap="truncate">
-                {mode === 'theme' ? '> ' : '  '}Select Theme{' '}
-                <Text color={Colors.Gray}>{otherScopeModifiedMessage}</Text>
-              </Text>
-              <RadioButtonSelect
-                items={themeItems}
-                initialIndex={safeInitialThemeIndex}
-                onSelect={handleThemeSelect}
-                onHighlight={handleThemeHighlight}
-                isFocused={mode === 'theme'}
-                maxItemsToShow={8}
-                showScrollArrows={true}
-                showNumbers={mode === 'theme'}
-              />
-            </>
-          ) : (
-            <ScopeSelector
-              onSelect={handleScopeSelect}
-              onHighlight={handleScopeHighlight}
-              isFocused={mode === 'scope'}
+      {mode === 'theme' ? (
+        <Box flexDirection="row">
+          {/* Left Column: Selection */}
+          <Box flexDirection="column" width="45%" paddingRight={2}>
+            <Text bold={mode === 'theme'} wrap="truncate">
+              {mode === 'theme' ? '> ' : '  '}Select Theme{' '}
+              <Text color={Colors.Gray}>{otherScopeModifiedMessage}</Text>
+            </Text>
+            <RadioButtonSelect
+              items={themeItems}
+              initialIndex={safeInitialThemeIndex}
+              onSelect={handleThemeSelect}
+              onHighlight={handleThemeHighlight}
+              isFocused={mode === 'theme'}
+              maxItemsToShow={8}
+              showScrollArrows={true}
+              showNumbers={mode === 'theme'}
             />
-          )}
-        </Box>
+          </Box>
 
-        {/* Right Column: Preview */}
-        <Box flexDirection="column" width="55%" paddingLeft={2}>
-          <Text bold>Preview</Text>
-          {/* Get the Theme object for the highlighted theme, fall back to default if not found */}
-          {(() => {
-            const previewTheme =
-              themeManager.getTheme(
-                highlightedThemeName || DEFAULT_THEME.name,
-              ) || DEFAULT_THEME;
-            return (
-              <Box
-                borderStyle="single"
-                borderColor={Colors.Gray}
-                paddingTop={includePadding ? 1 : 0}
-                paddingBottom={includePadding ? 1 : 0}
-                paddingLeft={1}
-                paddingRight={1}
-                flexDirection="column"
-              >
-                {colorizeCode(
-                  `# function
+          {/* Right Column: Preview */}
+          <Box flexDirection="column" width="55%" paddingLeft={2}>
+            <Text bold>Preview</Text>
+            {/* Get the Theme object for the highlighted theme, fall back to default if not found */}
+            {(() => {
+              const previewTheme =
+                themeManager.getTheme(
+                  highlightedThemeName || DEFAULT_THEME.name,
+                ) || DEFAULT_THEME;
+              return (
+                <Box
+                  borderStyle="single"
+                  borderColor={Colors.Gray}
+                  paddingTop={includePadding ? 1 : 0}
+                  paddingBottom={includePadding ? 1 : 0}
+                  paddingLeft={1}
+                  paddingRight={1}
+                  flexDirection="column"
+                >
+                  {colorizeCode(
+                    `# function
 def fibonacci(n):
     a, b = 0, 1
     for _ in range(n):
         a, b = b, a + b
     return a`,
-                  'python',
-                  codeBlockHeight,
-                  colorizeCodeWidth,
-                )}
-                <Box marginTop={1} />
-                <DiffRenderer
-                  diffContent={`--- a/util.py
+                    'python',
+                    codeBlockHeight,
+                    colorizeCodeWidth,
+                  )}
+                  <Box marginTop={1} />
+                  <DiffRenderer
+                    diffContent={`--- a/util.py
 +++ b/util.py
-@@ -1,2 +1,2
+@@ -1,2 +1,2 @@
 - print("Hello, " + name)
 + print(f"Hello, {name}!")
 `}
-                  availableTerminalHeight={diffHeight}
-                  terminalWidth={colorizeCodeWidth}
-                  theme={previewTheme}
-                />
-              </Box>
-            );
-          })()}
+                    availableTerminalHeight={diffHeight}
+                    terminalWidth={colorizeCodeWidth}
+                    theme={previewTheme}
+                  />
+                </Box>
+              );
+            })()}
+          </Box>
         </Box>
-      </Box>
+      ) : (
+        <ScopeSelector
+          onSelect={handleScopeSelect}
+          onHighlight={handleScopeHighlight}
+          isFocused={mode === 'scope'}
+        />
+      )}
       <Box marginTop={1}>
         <Text color={Colors.Gray} wrap="truncate">
           (Use Enter to {mode === 'theme' ? 'select' : 'apply scope'}, Tab to{' '}
