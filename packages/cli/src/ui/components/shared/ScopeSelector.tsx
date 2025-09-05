@@ -17,14 +17,22 @@ interface ScopeSelectorProps {
   onHighlight: (scope: SettingScope) => void;
   /** Whether the component is focused */
   isFocused: boolean;
+  /** The initial scope to select */
+  initialScope: SettingScope;
 }
 
 export function ScopeSelector({
   onSelect,
   onHighlight,
   isFocused,
+  initialScope,
 }: ScopeSelectorProps): React.JSX.Element {
   const scopeItems = getScopeItems();
+
+  const initialIndex = scopeItems.findIndex(
+    (item) => item.value === initialScope,
+  );
+  const safeInitialIndex = initialIndex >= 0 ? initialIndex : 0;
 
   return (
     <Box flexDirection="column">
@@ -33,7 +41,7 @@ export function ScopeSelector({
       </Text>
       <RadioButtonSelect
         items={scopeItems}
-        initialIndex={0} // Default to User Settings
+        initialIndex={safeInitialIndex}
         onSelect={onSelect}
         onHighlight={onHighlight}
         isFocused={isFocused}

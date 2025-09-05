@@ -73,9 +73,8 @@ export function ThemeDialog({
   ];
 
   // Find the index of the selected theme, but only if it exists in the list
-  const selectedThemeName = settings.merged.ui?.theme || DEFAULT_THEME.name;
   const initialThemeIndex = themeItems.findIndex(
-    (item) => item.value === selectedThemeName,
+    (item) => item.value === highlightedThemeName,
   );
   // If not found, fall back to the first theme
   const safeInitialThemeIndex = initialThemeIndex >= 0 ? initialThemeIndex : 0;
@@ -264,6 +263,7 @@ def fibonacci(n):
           onSelect={handleScopeSelect}
           onHighlight={handleScopeHighlight}
           isFocused={mode === 'scope'}
+          initialScope={selectedScope}
         />
       )}
       <Box marginTop={1}>
