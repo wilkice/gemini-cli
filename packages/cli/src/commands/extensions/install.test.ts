@@ -5,9 +5,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { installCommand, handleInstall } from './install.js';
+import { installCommand } from './install.js';
 import yargs from 'yargs';
-import * as extension from '../../config/extension.js';
 
 vi.mock('../../config/extension.js', () => ({
   installExtension: vi.fn(),
