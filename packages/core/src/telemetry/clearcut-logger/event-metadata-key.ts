@@ -331,4 +331,20 @@ export enum EventMetadataKey {
 
   // Logs the current nodejs version
   GEMINI_CLI_NODE_VERSION = 83,
+
+  // ==========================================================================
+  // Tool Output Truncated Event Keys
+  // ===========================================================================
+
+  // Logs the original length of the tool output.
+  GEMINI_CLI_TOOL_OUTPUT_TRUNCATED_ORIGINAL_LENGTH = 85,
+
+  // Logs the truncated length of the tool output.
+  GEMINI_CLI_TOOL_OUTPUT_TRUNCATED_TRUNCATED_LENGTH = 86,
+
+  // Logs the threshold at which the tool output was truncated.
+  GEMINI_CLI_TOOL_OUTPUT_TRUNCATED_THRESHOLD = 87,
+
+  // Logs the number of lines the tool output was truncated to.
+  GEMINI_CLI_TOOL_OUTPUT_TRUNCATED_LINES = 88,
 }

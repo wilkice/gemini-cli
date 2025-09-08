@@ -24,6 +24,7 @@ import type {
   InvalidChunkEvent,
   ContentRetryEvent,
   ContentRetryFailureEvent,
+  ToolOutputTruncatedEvent,
 } from '../types.js';
 import { EventMetadataKey } from './event-metadata-key.js';
 import type { Config } from '../../config/config.js';
@@ -55,6 +56,7 @@ export enum EventNames {
   INVALID_CHUNK = 'invalid_chunk',
   CONTENT_RETRY = 'content_retry',
   CONTENT_RETRY_FAILURE = 'content_retry_failure',
+  TOOL_OUTPUT_TRUNCATED = 'tool_output_truncated',
 }
 
 export interface LogResponse {
@@ -821,6 +823,39 @@ export class ClearcutLogger {
 
     this.enqueueLogEvent(
       this.createLogEvent(EventNames.CONTENT_RETRY_FAILURE, data),
+    );
+    this.flushIfNeeded();
+  }
+
+  logToolOutputTruncatedEvent(event: ToolOutputTruncatedEvent): void {
+    const data: EventValue[] = [
+      {
+        gemini_cli_key: EventMetadataKey.GEMINI_CLI_TOOL_CALL_NAME,
+        value: event.tool_name,
+      },
+      {
+        gemini_cli_key:
+          EventMetadataKey.GEMINI_CLI_TOOL_OUTPUT_TRUNCATED_ORIGINAL_LENGTH,
+        value: String(event.original_content_length),
+      },
+      {
+        gemini_cli_key:
+          EventMetadataKey.GEMINI_CLI_TOOL_OUTPUT_TRUNCATED_TRUNCATED_LENGTH,
+        value: String(event.truncated_content_length),
+      },
+      {
+        gemini_cli_key:
+          EventMetadataKey.GEMINI_CLI_TOOL_OUTPUT_TRUNCATED_THRESHOLD,
+        value: String(event.threshold),
+      },
+      {
+        gemini_cli_key: EventMetadataKey.GEMINI_CLI_TOOL_OUTPUT_TRUNCATED_LINES,
+        value: String(event.lines),
+      },
+    ];
+
+    this.enqueueLogEvent(
+      this.createLogEvent(EventNames.TOOL_OUTPUT_TRUNCATED, data),
     );
     this.flushIfNeeded();
   }

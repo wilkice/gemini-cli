@@ -133,6 +133,7 @@ export class ToolCallEvent implements BaseTelemetryEvent {
   error_type?: string;
   prompt_id: string;
   tool_type: 'native' | 'mcp';
+  content_length?: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: { [key: string]: any };
 
@@ -153,6 +154,7 @@ export class ToolCallEvent implements BaseTelemetryEvent {
       typeof call.tool !== 'undefined' && call.tool instanceof DiscoveredMCPTool
         ? 'mcp'
         : 'native';
+    this.content_length = call.response.contentLength;
 
     if (
       call.status === 'success' &&
@@ -518,3 +520,34 @@ export type TelemetryEvent =
   | InvalidChunkEvent
   | ContentRetryEvent
   | ContentRetryFailureEvent;
+
+export class ToolOutputTruncatedEvent implements BaseTelemetryEvent {
+  readonly eventName = 'tool_output_truncated';
+  readonly 'event.timestamp' = new Date().toISOString();
+  'event.name': string;
+  tool_name: string;
+  original_content_length: number;
+  truncated_content_length: number;
+  threshold: number;
+  lines: number;
+  prompt_id: string;
+
+  constructor(
+    prompt_id: string,
+    details: {
+      toolName: string;
+      originalContentLength: number;
+      truncatedContentLength: number;
+      threshold: number;
+      lines: number;
+    },
+  ) {
+    this['event.name'] = this.eventName;
+    this.prompt_id = prompt_id;
+    this.tool_name = details.toolName;
+    this.original_content_length = details.originalContentLength;
+    this.truncated_content_length = details.truncatedContentLength;
+    this.threshold = details.threshold;
+    this.lines = details.lines;
+  }
+}
