@@ -485,7 +485,7 @@ export const useGeminiStream = (
         {
           type: MessageType.ERROR,
           text: parseAndFormatApiError(
-            eventValue.error,
+            eventValue?.error || 'aaa An unknown streaming error occurred.',
             config.getContentGeneratorConfig()?.authType,
             undefined,
             config.getModel(),
